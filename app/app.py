@@ -35,7 +35,7 @@ def main():
 	st.markdown("<h1 style='text-align: center;'>Fama-French 5 Factor Model</h1>", unsafe_allow_html=True)
 	fama_french_5_factor_equation = """
 		<div style="text-align: center;font-size: 25px;font-family: math;">
-        	R<sub>it</sub> — R<sub>ft</sub> = &alpha;<sub>i</sub> + &beta;<sub>i</sub>(RM<sub>t</sub> — RF<sub>t</sub>) + s<sub>i</sub>SMB<sub>t</sub> + h<sub>i</sub>HML<sub>t</sub> + r<sub>i</sub>RMW<sub>t</sub> + c<sub>i</sub>CMA<sub>t</sub>
+        	R<sub>it</sub> — RF<sub>t</sub> = &alpha;<sub>i</sub> + &beta;<sub>i</sub>(RM<sub>t</sub> — RF<sub>t</sub>) + s<sub>i</sub>SMB<sub>t</sub> + h<sub>i</sub>HML<sub>t</sub> + r<sub>i</sub>RMW<sub>t</sub> + c<sub>i</sub>CMA<sub>t</sub>
 		</div>
         """
 	st.markdown(fama_french_5_factor_equation, unsafe_allow_html=True)
