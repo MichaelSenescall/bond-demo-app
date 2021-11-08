@@ -12,6 +12,7 @@ WORKDIR /app
 # Copy code into Docker container
 COPY app.py ./
 COPY /.streamlit ./.streamlit
+COPY /data ./data
 
 # Install dependencies
 COPY requirements.txt ./
