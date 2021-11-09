@@ -1,13 +1,20 @@
 import streamlit as st
 import pandas as pd
 import statsmodels.api as sm
+import plotly.express as px
 
 def load_fama_french_5_factor_rets():
-	return pd.read_csv("data/fama_french_5_factor_rets.csv", header=0, index_col=0)
+	df = pd.read_csv("data/fama_french_5_factor_rets.csv", header=0, index_col=0)
+	df.index = pd.to_datetime(df.index)
+	df.index = df.index.to_period('M')
+	return df
 	
 def load_yahoo_rets(series_rf):
-	df_yahoo = pd.read_csv("data/yahoo_rets.csv", header=0, index_col=0)
-	return df_yahoo.subtract(series_rf, axis=0)
+	df = pd.read_csv("data/yahoo_rets.csv", header=0, index_col=0)
+	df.subtract(series_rf, axis=0)
+	df.index = pd.to_datetime(df.index)
+	df.index = df.index.to_period('M')
+	return df
 
 def regress(dependent_variable, explanatory_variables):
 	# Create safe copies
@@ -26,7 +33,60 @@ def regress(dependent_variable, explanatory_variables):
 	lm = sm.OLS(dependent_variable, explanatory_variables).fit()
 	return lm
 
+def draw_factors_graph(df, container):
+	chart_container = container.container()
+
+	# Year Selector
+	min = int(df.index.year.min())
+	max = int(df.index.year.max())
+	selected_years = container.slider(label="Select Years", min_value=min, max_value=max, value=(min, max), key="5FG")
+	
+	mask = (df.index.year >= selected_years[0]) & (df.index.year <= selected_years[1])
+	df = df.loc[mask]
+
+	# Create Chart
+	df.index = df.index.map(str)
+	fig = px.line(df, x=df.index, y=df.columns, color_discrete_sequence=px.colors.qualitative.Antique)
+	fig.update_layout(
+		title="Factor Returns vs Time",
+		title_x=0.5,
+		legend_title_text="Factor",
+		xaxis_title="Date",
+		yaxis_title="Monthly Returns"
+	)
+
+	# Draw Chart & Return
+	chart_container.plotly_chart(fig, use_container_width=True)
+
+def draw_stock_graph(df, stock, container):
+	chart_container = container.container()
+
+	# Year Selector
+	min = int(df.index.year.min())
+	max = int(df.index.year.max())
+	selected_years = container.slider(label="Select Years", min_value=min, max_value=max, value=(min, max), key="SG")
+	
+	mask = (df.index.year >= selected_years[0]) & (df.index.year <= selected_years[1])
+	df = df.loc[mask]
+
+	# Create Chart
+	df.index = df.index.map(str)
+	fig = px.line(df, x=df.index, y=df[stock], color_discrete_sequence=px.colors.qualitative.Antique)
+	fig.update_layout(
+		title=f"{stock} Returns vs Time",
+		title_x=0.5,
+		legend_title_text="Stock",
+		xaxis_title="Date",
+		yaxis_title="Monthly Returns"
+	)
+
+	# Draw Chart & Return
+	chart_container.plotly_chart(fig, use_container_width=True)
+
 def main():
+	# Init
+	st.set_page_config(layout="wide")
+
 	# Load data
 	df_fama_french = load_fama_french_5_factor_rets()
 	df_yahoo = load_yahoo_rets(df_fama_french["RF"])
@@ -41,7 +101,7 @@ def main():
 	st.markdown(fama_french_5_factor_equation, unsafe_allow_html=True)
 
 	# User input
-	stock_selector = st.selectbox("Please select a stock for price prediction", df_yahoo.columns)
+	selected_stock = st.selectbox("Please select a stock for price prediction", df_yahoo.columns)
 
 	min_value = -10.0
 	max_value = 10.0
@@ -56,11 +116,21 @@ def main():
 
 	# Run model
 	factors = ["Mkt-RF", "SMB", "HML", "RMW", "CMA"]
-	results = regress(df_yahoo[stock_selector], df_fama_french.loc[:,factors]).params
+	results = regress(df_yahoo[selected_stock], df_fama_french.loc[:,factors]).params
 	ret_minus_rf = results["Alpha"] + (results["Mkt-RF"]*Mkt_minus_RF) + (results["SMB"]*SMB) + (results["HML"]*HML) + (results["RMW"]*RMW) + (results["CMA"]*CMA)
 
 	# Display results
-	st.markdown(f"R<sub>it</sub> — R<sub>ft</sub> = {round(ret_minus_rf*100, 4)}%", unsafe_allow_html=True)
+	result_text = f"""
+		<div style="text-align: center;font-size: 20px;font-family: math;">
+			R<sub>it</sub> — RF<sub>t</sub> = {round(ret_minus_rf*100, 4)}%
+		</div>
+	"""
+	st.markdown(result_text, unsafe_allow_html=True)
+
+	# Draw graphs
+	cols = st.columns(2)
+	draw_factors_graph(df_fama_french, cols[0])
+	draw_stock_graph(df_yahoo, selected_stock, cols[1])
 
 if __name__ == "__main__":
 	main()
