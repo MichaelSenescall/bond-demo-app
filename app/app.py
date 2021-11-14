@@ -119,13 +119,13 @@ def main():
 	container_result = cols_top_model[1].container()
 
 	selected_stock = cols_top_model[1].selectbox("Please select a stock for price prediction", df_yahoo.columns)
-	Mkt_minus_RF = container_model.slider("Mkt-RF", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	Mkt_minus_RF = container_model.slider("Mkt-RF (Market)", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
 
 	cols = container_model.columns(2)
-	SMB = cols[0].slider("SMB", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
-	RMW = cols[0].slider("RMW", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
-	HML = cols[1].slider("HML", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
-	CMA = cols[1].slider("CMA", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	SMB = cols[0].slider("SMB (Size)", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	RMW = cols[0].slider("RMW (Profitability)", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	HML = cols[1].slider("HML (Value)", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	CMA = cols[1].slider("CMA (Investment)", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
 
 	Mkt_minus_RF /= 100
 	SMB /= 100
