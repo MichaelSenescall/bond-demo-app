@@ -94,14 +94,7 @@ def draw_stock_graph(df, stock, container):
 def main():
 	# Init
 	st.set_page_config(layout="wide")
-	hide_menu_style = """
-        <style>
-        #MainMenu {visibility: hidden;}
-		header {visibility: hidden;}
-		footer {visibility: hidden;}
-        </style>
-        """
-	st.markdown(hide_menu_style, unsafe_allow_html=True)
+	load_css()
 
 	# Load data
 	df_fama_french = load_fama_french_5_factor_rets()
@@ -160,9 +153,6 @@ def main():
 	cols = st.columns(2)
 	draw_factors_graph(df_fama_french, cols[0])
 	draw_stock_graph(df_yahoo, selected_stock, cols[1])
-
-	# Custom CSS (at the end so it doesn't interfere with element order, if you want faster style loading than put this at the top)
-	load_css()
 
 if __name__ == "__main__":
 	main()
