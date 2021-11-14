@@ -3,6 +3,12 @@ import pandas as pd
 import statsmodels.api as sm
 import plotly.express as px
 
+def load_css():
+	file_name = ".streamlit/style.css"
+	with open(file_name) as file:
+		styles = file.read()
+		st.markdown(f"<style>{styles}</style>", unsafe_allow_html=True)
+
 def load_fama_french_5_factor_rets():
 	df = pd.read_csv("data/fama_french_5_factor_rets.csv", header=0, index_col=0)
 	df.index = pd.to_datetime(df.index)
@@ -111,27 +117,22 @@ def main():
 	st.markdown(fama_french_5_factor_equation, unsafe_allow_html=True)
 
 	# User input
-	selected_stock = st.selectbox("Please select a stock for price prediction", df_yahoo.columns)
-
-	result_container = st.container()
-
 	min_value = -20.0
 	max_value = 20.0
 	step = 0.1
 
-	Mkt_minus_RF = st.slider("Mkt-RF", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	container_model = st.container()
+	cols_top_model = container_model.columns(3)
+	container_result = cols_top_model[1].container()
 
-	cols = st.columns(2)
-	#SMB = cols[0].slider("SMB", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
-	#RMW = cols[0].slider("RMW", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
-	#HML = cols[1].slider("HML", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
-	#CMA = cols[1].slider("CMA", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	selected_stock = cols_top_model[1].selectbox("Please select a stock for price prediction", df_yahoo.columns)
+	Mkt_minus_RF = container_model.slider("Mkt-RF", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
 
-
-	SMB = cols[0].number_input("SMB", min_value=min_value, max_value=max_value, value=0.1, step=step, format="%.1f")
-	RMW = cols[0].number_input("RMW", min_value=min_value, max_value=max_value, value=0.3, step=step, format="%.1f")
-	HML = cols[1].number_input("HML", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f")
-	CMA = cols[1].number_input("CMA", min_value=min_value, max_value=max_value, value=0.1, step=step, format="%.1f")
+	cols = container_model.columns(2)
+	SMB = cols[0].slider("SMB", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	RMW = cols[0].slider("RMW", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	HML = cols[1].slider("HML", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
+	CMA = cols[1].slider("CMA", min_value=min_value, max_value=max_value, value=0.0, step=step, format="%.1f%%")
 
 	Mkt_minus_RF /= 100
 	SMB /= 100
@@ -145,17 +146,23 @@ def main():
 	ret_minus_rf = results["Alpha"] + (results["Mkt-RF"]*Mkt_minus_RF) + (results["SMB"]*SMB) + (results["HML"]*HML) + (results["RMW"]*RMW) + (results["CMA"]*CMA)
 
 	# Display results
+	border_colour = "green"
+	if ret_minus_rf < 0: border_colour = "red"
+
 	result_text = f"""
-		<div style="border: 1px solid green;text-align: center;font-size: 20px;font-family: math;">
+		<p style="border: 1px solid {border_colour};text-align: center;font-size: 20px;font-family: math;">
 			R<sub>it</sub> — RF<sub>t</sub> = {round(ret_minus_rf*100, 4)}%
-		</div>
+		</p>
 	"""
-	result_container.markdown(result_text, unsafe_allow_html=True)
+	container_result.markdown(result_text, unsafe_allow_html=True)
 
 	# Draw graphs
 	cols = st.columns(2)
 	draw_factors_graph(df_fama_french, cols[0])
 	draw_stock_graph(df_yahoo, selected_stock, cols[1])
+
+	# Custom CSS (at the end so it doesn't interfere with element order, if you want faster style loading than put this at the top)
+	load_css()
 
 if __name__ == "__main__":
 	main()
