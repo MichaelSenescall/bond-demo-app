@@ -53,7 +53,7 @@ def draw_factors_graph(df, container):
 	# Create Chart
 	df.index = df.index.map(str)
 	fig = px.line(df, x=df.index, y=df.columns, color_discrete_sequence=px.colors.qualitative.Antique)
-	fig.layout.yaxis.tickformat = ",.0%"
+	fig.layout.yaxis.tickformat = ".1%"
 	fig.update_layout(
 		title="Factor Returns vs Time",
 		title_x=0.5,
@@ -79,7 +79,7 @@ def draw_stock_graph(df, stock, container):
 	# Create Chart
 	df.index = df.index.map(str)
 	fig = px.line(df, x=df.index, y=df[stock], color_discrete_sequence=px.colors.qualitative.Antique)
-	fig.layout.yaxis.tickformat = ",.0%"
+	fig.layout.yaxis.tickformat = ".1%"
 	fig.update_layout(
 		title=f"{stock} Returns vs Time",
 		title_x=0.5,
@@ -150,7 +150,7 @@ def main():
 	if ret_minus_rf < 0: border_colour = "red"
 
 	result_text = f"""
-		<p style="border: 1px solid {border_colour};text-align: center;font-size: 20px;font-family: math;">
+		<p style="border: 3px solid {border_colour};text-align: center;font-size: 20px;font-family: math;">
 			R<sub>it</sub> — RF<sub>t</sub> = {round(ret_minus_rf*100, 4)}%
 		</p>
 	"""
