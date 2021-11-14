@@ -144,7 +144,7 @@ def main():
 
 	result_text = f"""
 		<p style="border: 3px solid {border_colour};text-align: center;font-size: 20px;font-family: math;">
-			R<sub>it</sub> — RF<sub>t</sub> = {round(ret_minus_rf*100, 4)}%
+			R<sub>it</sub> — RF<sub>t</sub> = {round(ret_minus_rf*100, 1)}%
 		</p>
 	"""
 	container_result.markdown(result_text, unsafe_allow_html=True)
