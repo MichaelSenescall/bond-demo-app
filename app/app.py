@@ -140,6 +140,8 @@ def main():
 
 	# Display results
 	ret_minus_rf = round(ret_minus_rf*100, 1)
+	ret_minus_rf += 0 # Convert -0.0 to 0.0
+	
 	border_colour = "green"
 	if ret_minus_rf < 0: border_colour = "red"
 
