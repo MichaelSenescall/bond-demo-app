@@ -139,12 +139,13 @@ def main():
 	ret_minus_rf = results["Alpha"] + (results["Mkt-RF"]*Mkt_minus_RF) + (results["SMB"]*SMB) + (results["HML"]*HML) + (results["RMW"]*RMW) + (results["CMA"]*CMA)
 
 	# Display results
+	ret_minus_rf = round(ret_minus_rf*100, 1)
 	border_colour = "green"
 	if ret_minus_rf < 0: border_colour = "red"
 
 	result_text = f"""
 		<p style="border: 3px solid {border_colour};text-align: center;font-size: 20px;font-family: math;">
-			R<sub>it</sub> — RF<sub>t</sub> = {round(ret_minus_rf*100, 1)}%
+			R<sub>it</sub> — RF<sub>t</sub> = {ret_minus_rf}%
 		</p>
 	"""
 	container_result.markdown(result_text, unsafe_allow_html=True)
